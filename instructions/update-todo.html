@@ -1,0 +1,144 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex"><meta name="built-on" content="2024-11-09T13:22:59.1370942"><title>📝 Creating `updateTodo` | AWS Serverless Workshop</title><script type="application/json" id="virtual-toc-data">[{"id":"step-by-step-defining-the-updatetodo-lambda-function","level":0,"title":"📜 Step-by-Step: Defining the updateTodo Lambda Function","anchor":"#step-by-step-defining-the-updatetodo-lambda-function"},{"id":"adding-updatetodo-to-the-cdk-stack","level":0,"title":"➕ Adding updateTodo to the CDK Stack","anchor":"#adding-updatetodo-to-the-cdk-stack"},{"id":"testing-and-deployment","level":0,"title":"🧪 Testing and Deployment","anchor":"#testing-and-deployment"},{"id":"congratulations","level":0,"title":"🎉 Congratulations!","anchor":"#congratulations"},{"id":"additional-resources","level":0,"title":"📚 Additional Resources","anchor":"#additional-resources"}]</script><script type="application/json" id="topic-shortcuts"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b419/app.css" rel="stylesheet"><meta name="msapplication-TileColor" content="#000000"><link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"><meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="📝 Creating `updateTodo` | AWS Serverless Workshop"><meta property="og:description" content=""><meta property="og:image" content=""><meta property="og:site_name" content="AWS Serverless Workshop Help"><meta property="og:type" content="website"><meta property="og:locale" content="en_US"><meta property="og:url" content="writerside-documentation//1/update-todo.html"><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="📝 Creating `updateTodo` | AWS Serverless Workshop"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json">{
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "@id": "writerside-documentation//1/update-todo.html#webpage",
+    "url": "writerside-documentation//1/update-todo.html",
+    "name": "📝 Creating `updateTodo` | AWS Serverless Workshop",
+    "description": "",
+    "image": "",
+    "inLanguage":"en-US"
+}</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json">{
+    "@type": "WebSite",
+    "@id": "writerside-documentation/#website",
+    "url": "writerside-documentation/",
+    "name": "AWS Serverless Workshop Help"
+}</script><!-- End Schema.org --></head><body data-id="Update-Todo" data-main-title="📝 Creating `updateTodo`" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs="main.md|Introduction"><div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>AWS Serverless Workshop 1 Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Update-Todo" id="Update-Todo.md">📝 Creating `updateTodo`</h1><p id="-e3l7rc_4"><span class="control" id="-e3l7rc_12">Now, let's extend our serverless application by adding an <code class="code" id="-e3l7rc_13">updateTodo</code> function. This function will allow us to modify specific attributes of a todo item in our DynamoDB table using the AWS SDK v3.</span></p><section class="chapter"><h2 id="step-by-step-defining-the-updatetodo-lambda-function" data-toc="step-by-step-defining-the-updatetodo-lambda-function">📜 Step-by-Step: Defining the <code class="code" id="-e3l7rc_18">updateTodo</code> Lambda Function</h2><section class="chapter"><h3 id="1-create-the-updatetodo-ts-file" data-toc="1-create-the-updatetodo-ts-file">1. <span class="control" id="-e3l7rc_21">Create the <code class="code" id="-e3l7rc_22">updateTodo.ts</code> File</span></h3><ul class="list _bullet" id="-e3l7rc_20"><li class="list__item" id="-e3l7rc_23"><p id="-e3l7rc_25"><span class="control" id="-e3l7rc_26">What to do:</span> We'll start by creating a new file for our <code class="code" id="-e3l7rc_27">updateTodo</code> Lambda function.</p></li><li class="list__item" id="-e3l7rc_24"><p id="-e3l7rc_28"><span class="control" id="-e3l7rc_32">How:</span></p><p id="-e3l7rc_29">Open your terminal and run:</p><div class="code-block" data-lang="bash">
+touch lambda/updateTodo.ts
+</div><ul class="list _bullet" id="-e3l7rc_31"><li class="list__item" id="-e3l7rc_33"><p>This command creates a new TypeScript file named <code class="code" id="-e3l7rc_34">updateTodo.ts</code> in the <code class="code" id="-e3l7rc_35">lambda</code> directory.</p></li></ul></li></ul></section><section class="chapter"><h3 id="2-write-the-lambda-function-code" data-toc="2-write-the-lambda-function-code">2. <span class="control" id="-e3l7rc_38">Write the Lambda Function Code</span></h3><ul class="list _bullet" id="-e3l7rc_37"><li class="list__item" id="-e3l7rc_39"><p id="-e3l7rc_40"><span class="control" id="-e3l7rc_42">Open <code class="code" id="-e3l7rc_43">updateTodo.ts</code></span> in your code editor and add the following code:</p><div class="code-block" data-lang="ts">
+// Import necessary AWS SDK v3 clients and commands
+import { DynamoDBClient } from &quot;@aws-sdk/client-dynamodb&quot;;
+import {
+  DynamoDBDocumentClient,
+  UpdateCommand,
+  UpdateCommandInput,
+} from &quot;@aws-sdk/lib-dynamodb&quot;;
+
+// Define the interface for a Todo item
+interface TodoItem {
+  id: string;
+  title: string;
+  description: string;
+  completed: boolean;
+}
+
+// Initialize the DynamoDB Client
+const ddbClient = new DynamoDBClient({
+  region: process.env.AWS_REGION, // Your AWS region
+});
+
+// Initialize the DynamoDB Document Client
+const dynamoDb = DynamoDBDocumentClient.from(ddbClient);
+
+export const handler = async (event: any) =&gt; {
+  try {
+    const { id } = event.pathParameters;
+    const data = JSON.parse(event.body);
+
+    // Basic validation to ensure at least one field is provided
+    if (!data.title &amp;&amp; !data.description &amp;&amp; data.completed === undefined) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: &quot;At least one field (title, description, completed) must be provided for update&quot;,
+        }),
+      };
+    }
+
+    // Build the UpdateExpression dynamically based on provided fields
+    let updateExpression = &quot;set&quot;;
+    const ExpressionAttributeValues: { [key: string]: any } = {};
+    const ExpressionAttributeNames: { [key: string]: string } = {};
+
+    if (data.title) {
+      updateExpression += &quot; #title = :title,&quot;;
+      ExpressionAttributeValues[&quot;:title&quot;] = data.title;
+      ExpressionAttributeNames[&quot;#title&quot;] = &quot;title&quot;;
+    }
+
+    if (data.description) {
+      updateExpression += &quot; #description = :description,&quot;;
+      ExpressionAttributeValues[&quot;:description&quot;] = data.description;
+      ExpressionAttributeNames[&quot;#description&quot;] = &quot;description&quot;;
+    }
+
+    if (data.completed !== undefined) {
+      updateExpression += &quot; #completed = :completed,&quot;;
+      ExpressionAttributeValues[&quot;:completed&quot;] = data.completed;
+      ExpressionAttributeNames[&quot;#completed&quot;] = &quot;completed&quot;;
+    }
+
+    // Remove the trailing comma
+    updateExpression = updateExpression.slice(0, -1);
+
+    // Set up parameters for the UpdateCommand
+    const params: UpdateCommandInput = {
+      TableName: process.env.TABLE_NAME!, // DynamoDB table name from environment variables
+      Key: { id }, // The key of the item to update
+      UpdateExpression: updateExpression,
+      ExpressionAttributeValues,
+      ExpressionAttributeNames,
+      ReturnValues: &quot;UPDATED_NEW&quot;,
+    };
+
+    // Execute the UpdateCommand to update the item
+    const result = await dynamoDb.send(new UpdateCommand(params));
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: &quot;Todo updated successfully&quot;,
+        updatedAttributes: result.Attributes,
+      }),
+    };
+  } catch (error) {
+    console.error(&quot;Error updating todo item:&quot;, error);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: &quot;Could not update the todo item&quot; }),
+    };
+  }
+};
+</div></li></ul></section><section class="chapter"><h3 id="3-understanding-the-code" data-toc="3-understanding-the-code">3. <span class="control" id="-e3l7rc_50">Understanding the Code</span></h3><p id="-e3l7rc_45">Let's break down what this code does in simple terms.</p><section class="chapter"><h4 id="a-imports" data-toc="a-imports">a. <span class="control" id="-e3l7rc_53">Imports</span></h4><ul class="list _bullet" id="-e3l7rc_52"><li class="list__item" id="-e3l7rc_54"><p><span class="control" id="-e3l7rc_55">AWS SDK v3 Modules:</span></p><ul class="list _bullet" id="-e3l7rc_56"><li class="list__item" id="-e3l7rc_57"><p><code class="code" id="-e3l7rc_59">DynamoDBClient</code>: A client for interacting with DynamoDB at a low level.</p></li><li class="list__item" id="-e3l7rc_58"><p><code class="code" id="-e3l7rc_60">DynamoDBDocumentClient</code>, <code class="code" id="-e3l7rc_61">UpdateCommand</code>, <code class="code" id="-e3l7rc_62">UpdateCommandInput</code>: Higher-level abstractions that simplify our interactions with DynamoDB.</p></li></ul></li></ul></section><section class="chapter"><h4 id="b-define-the-todoitem-interface" data-toc="b-define-the-todoitem-interface">b. <span class="control" id="-e3l7rc_65">Define the <code class="code" id="-e3l7rc_66">TodoItem</code> Interface</span></h4><ul class="list _bullet" id="-e3l7rc_64"><li class="list__item" id="-e3l7rc_67"><p><span class="control" id="-e3l7rc_69">Purpose:</span> Specifies the structure of a todo item for consistency and type safety.</p></li><li class="list__item" id="-e3l7rc_68"><p><span class="control" id="-e3l7rc_70">Fields:</span></p><ul class="list _bullet" id="-e3l7rc_71"><li class="list__item" id="-e3l7rc_72"><p><code class="code" id="-e3l7rc_76">id</code>: Unique identifier of the todo item.</p></li><li class="list__item" id="-e3l7rc_73"><p><code class="code" id="-e3l7rc_77">title</code>: Title of the todo.</p></li><li class="list__item" id="-e3l7rc_74"><p><code class="code" id="-e3l7rc_78">description</code>: Description of the todo.</p></li><li class="list__item" id="-e3l7rc_75"><p><code class="code" id="-e3l7rc_79">completed</code>: Boolean indicating if the todo is completed.</p></li></ul></li></ul></section><section class="chapter"><h4 id="c-initialize-the-dynamodb-clients" data-toc="c-initialize-the-dynamodb-clients">c. <span class="control" id="-e3l7rc_82">Initialize the DynamoDB Clients</span></h4><ul class="list _bullet" id="-e3l7rc_81"><li class="list__item" id="-e3l7rc_83"><p><span class="control" id="-e3l7rc_85"><code class="code" id="-e3l7rc_86">ddbClient</code>:</span> Configured with your AWS region, it communicates with DynamoDB.</p></li><li class="list__item" id="-e3l7rc_84"><p><span class="control" id="-e3l7rc_87"><code class="code" id="-e3l7rc_88">dynamoDb</code>:</span> Simplifies the process of converting data to and from DynamoDB format.</p></li></ul></section><section class="chapter"><h4 id="d-the-handler-function" data-toc="d-the-handler-function">d. <span class="control" id="-e3l7rc_92">The Handler Function</span></h4><ul class="list _bullet" id="-e3l7rc_90"><li class="list__item" id="-e3l7rc_93"><p><span class="control" id="-e3l7rc_95">Purpose:</span> This function is executed when the Lambda function is triggered.</p></li><li class="list__item" id="-e3l7rc_94"><p><span class="control" id="-e3l7rc_96">Process:</span></p><ol class="list _decimal" id="-e3l7rc_97" type="1"><li class="list__item" id="-e3l7rc_98"><p><span class="control" id="-e3l7rc_105">Extract the <code class="code" id="-e3l7rc_107">id</code> Parameter:</span></p><ul class="list _bullet" id="-e3l7rc_106"><li class="list__item" id="-e3l7rc_108"><p>Retrieves the <code class="code" id="-e3l7rc_109">id</code> from the URL path parameters.</p></li></ul></li><li class="list__item" id="-e3l7rc_99"><p><span class="control" id="-e3l7rc_110">Parse the Incoming Data:</span></p><ul class="list _bullet" id="-e3l7rc_111"><li class="list__item" id="-e3l7rc_112"><p>Parses the JSON body of the request to get the fields to update.</p></li></ul></li><li class="list__item" id="-e3l7rc_100"><p><span class="control" id="-e3l7rc_113">Validate the Data:</span></p><ul class="list _bullet" id="-e3l7rc_114"><li class="list__item" id="-e3l7rc_115"><p>Checks that at least one of <code class="code" id="-e3l7rc_117">title</code>, <code class="code" id="-e3l7rc_118">description</code>, or <code class="code" id="-e3l7rc_119">completed</code> is provided.</p></li><li class="list__item" id="-e3l7rc_116"><p>If not, returns a <code class="code" id="-e3l7rc_120">400 Bad Request</code> response.</p></li></ul></li><li class="list__item" id="-e3l7rc_101"><p><span class="control" id="-e3l7rc_121">Build the Update Expression:</span></p><ul class="list _bullet" id="-e3l7rc_122"><li class="list__item" id="-e3l7rc_123"><p>Dynamically constructs the <code class="code" id="-e3l7rc_125">UpdateExpression</code> based on the fields provided.</p></li><li class="list__item" id="-e3l7rc_124"><p>Uses placeholders to safely pass values and avoid conflicts with reserved words.</p></li></ul></li><li class="list__item" id="-e3l7rc_102"><p><span class="control" id="-e3l7rc_126">Set Up Parameters for DynamoDB:</span></p><ul class="list _bullet" id="-e3l7rc_127"><li class="list__item" id="-e3l7rc_128"><p>Defines the table name, key, update expression, and attribute values/names.</p></li></ul></li><li class="list__item" id="-e3l7rc_103"><p><span class="control" id="-e3l7rc_129">Execute the Update Command:</span></p><ul class="list _bullet" id="-e3l7rc_130"><li class="list__item" id="-e3l7rc_131"><p>Updates the item in DynamoDB.</p></li></ul></li><li class="list__item" id="-e3l7rc_104"><p><span class="control" id="-e3l7rc_132">Handle the Response:</span></p><ul class="list _bullet" id="-e3l7rc_133"><li class="list__item" id="-e3l7rc_134"><p>On success, returns a <code class="code" id="-e3l7rc_136">200</code> status code with a success message and the updated attributes.</p></li><li class="list__item" id="-e3l7rc_135"><p>On failure, logs the error and returns a <code class="code" id="-e3l7rc_137">500 Internal Server Error</code>.</p></li></ul></li></ol></li></ul></section></section></section><section class="chapter"><h2 id="adding-updatetodo-to-the-cdk-stack" data-toc="adding-updatetodo-to-the-cdk-stack">➕ Adding <code class="code" id="-e3l7rc_143">updateTodo</code> to the CDK Stack</h2><p id="-e3l7rc_139">Now, let's integrate the <code class="code" id="-e3l7rc_144">updateTodo</code> Lambda function into our AWS CDK stack and connect it to API Gateway.</p><section class="chapter"><h3 id="1-define-the-updatetodo-lambda-function-in-the-stack" data-toc="1-define-the-updatetodo-lambda-function-in-the-stack">1. <span class="control" id="-e3l7rc_147">Define the <code class="code" id="-e3l7rc_148">updateTodo</code> Lambda Function in the Stack</span></h3><ul class="list _bullet" id="-e3l7rc_146"><li class="list__item" id="-e3l7rc_149"><p id="-e3l7rc_151"><span class="control" id="-e3l7rc_152">Open your stack file (<code class="code" id="-e3l7rc_153">lib/serverless-app-stack.ts</code>).</span></p></li><li class="list__item" id="-e3l7rc_150"><p id="-e3l7rc_154"><span class="control" id="-e3l7rc_156">Add the following code:</span></p><div class="code-block" data-lang="ts">
+// Define the updateTodo Lambda Function
+const updateTodoFunction = new NodejsFunction(this, 'UpdateTodoFunction', {
+  entry: path.join(__dirname, '../lambda/updateTodo.ts'), // Path to your Lambda function code
+  handler: 'handler',
+  environment: {
+    TABLE_NAME: table.tableName, // Passes the DynamoDB table name
+    AWS_REGION: this.region,     // Passes the AWS region
+  },
+});
+</div></li></ul></section><section class="chapter"><h3 id="2-grant-write-permissions-to-the-lambda-function" data-toc="2-grant-write-permissions-to-the-lambda-function">2. <span class="control" id="-e3l7rc_159">Grant Write Permissions to the Lambda Function</span></h3><ul class="list _bullet" id="-e3l7rc_158"><li class="list__item" id="-e3l7rc_160"><p id="-e3l7rc_162"><span class="control" id="-e3l7rc_163">Why?</span> The function needs permission to update data in DynamoDB.</p></li><li class="list__item" id="-e3l7rc_161"><p id="-e3l7rc_164"><span class="control" id="-e3l7rc_166">How:</span></p><div class="code-block" data-lang="ts">
+table.grantWriteData(updateTodoFunction);
+</div></li></ul></section><section class="chapter"><h3 id="3-integrate-with-api-gateway" data-toc="3-integrate-with-api-gateway">3. <span class="control" id="-e3l7rc_170">Integrate with API Gateway</span></h3><ul class="list _bullet" id="-e3l7rc_168"><li class="list__item" id="-e3l7rc_171"><p id="-e3l7rc_173"><span class="control" id="-e3l7rc_174">Add a PATCH method to the <code class="code" id="-e3l7rc_175">/todos/{id}</code> resource to invoke <code class="code" id="-e3l7rc_176">updateTodoFunction</code>.</span></p></li><li class="list__item" id="-e3l7rc_172"><p id="-e3l7rc_177"><span class="control" id="-e3l7rc_180">How:</span></p><div class="code-block" data-lang="ts">
+// Create or get the /todos/{id} resource
+const todo = todos.addResource('{id}');
+
+// Integrate updateTodo Lambda with PATCH method on /todos/{id}
+const updateTodoIntegration = new apigateway.LambdaIntegration(updateTodoFunction);
+
+todo.addMethod('PATCH', updateTodoIntegration);  // PATCH /todos/{id}
+</div><ul class="list _bullet" id="-e3l7rc_179"><li class="list__item" id="-e3l7rc_181"><p><span class="control" id="-e3l7rc_182">Explanation:</span></p><ul class="list _bullet" id="-e3l7rc_183"><li class="list__item" id="-e3l7rc_184"><p><span class="control" id="-e3l7rc_186"><code class="code" id="-e3l7rc_187">{id}</code>:</span> Defines a path parameter in the URL.</p></li><li class="list__item" id="-e3l7rc_185"><p><span class="control" id="-e3l7rc_188">API Gateway Route:</span> When a PATCH request is made to <code class="code" id="-e3l7rc_189">/todos/{id}</code>, it triggers the <code class="code" id="-e3l7rc_190">updateTodoFunction</code>.</p></li></ul></li></ul></li></ul></section></section><section class="chapter"><h2 id="testing-and-deployment" data-toc="testing-and-deployment">🧪 Testing and Deployment</h2><section class="chapter"><h3 id="1-synthesize-the-cloudformation-template" data-toc="1-synthesize-the-cloudformation-template">1. <span class="control" id="-e3l7rc_196">Synthesize the CloudFormation Template</span></h3><ul class="list _bullet" id="-e3l7rc_195"><li class="list__item" id="-e3l7rc_197"><p id="-e3l7rc_199"><span class="control" id="-e3l7rc_201">Command:</span></p><div class="code-block" data-lang="bash">
+cdk synth
+</div></li><li class="list__item" id="-e3l7rc_198"><p id="-e3l7rc_202"><span class="control" id="-e3l7rc_203">Purpose:</span> To verify the resources that will be created or updated.</p></li></ul></section><section class="chapter"><h3 id="2-deploy-the-stack" data-toc="2-deploy-the-stack">2. <span class="control" id="-e3l7rc_206">Deploy the Stack</span></h3><ul class="list _bullet" id="-e3l7rc_205"><li class="list__item" id="-e3l7rc_207"><p id="-e3l7rc_209"><span class="control" id="-e3l7rc_211">Command:</span></p><div class="code-block" data-lang="bash">
+cdk deploy
+</div></li><li class="list__item" id="-e3l7rc_208"><p id="-e3l7rc_212"><span class="control" id="-e3l7rc_213">Note:</span> Confirm the deployment when prompted.</p></li></ul></section><section class="chapter"><h3 id="3-testing-the-patch-endpoint" data-toc="3-testing-the-patch-endpoint">3. <span class="control" id="-e3l7rc_218">Testing the PATCH Endpoint</span></h3><section class="chapter"><h4 id="a-find-your-api-s-url" data-toc="a-find-your-api-s-url">a. <span class="control" id="-e3l7rc_221">Find Your API's URL</span></h4><ul class="list _bullet" id="-e3l7rc_220"><li class="list__item" id="-e3l7rc_222"><p><span class="control" id="-e3l7rc_223">Where to look:</span> The <code class="code" id="-e3l7rc_224">cdk deploy</code> output or in the AWS Console under API Gateway.</p></li></ul></section><section class="chapter"><h4 id="b-send-a-patch-request" data-toc="b-send-a-patch-request">b. <span class="control" id="-e3l7rc_227">Send a PATCH Request</span></h4><ul class="list _bullet" id="-e3l7rc_226"><li class="list__item" id="-e3l7rc_228"><p id="-e3l7rc_231"><span class="control" id="-e3l7rc_233">Use Tools Like:</span></p><ul class="list _bullet" id="-e3l7rc_232"><li class="list__item" id="-e3l7rc_234"><p><span class="control" id="-e3l7rc_236">Postman</span></p></li><li class="list__item" id="-e3l7rc_235"><p><span class="control" id="-e3l7rc_237">curl</span></p></li></ul></li><li class="list__item" id="-e3l7rc_229"><p id="-e3l7rc_238"><span class="control" id="-e3l7rc_241">Sample Request Using <code class="code" id="-e3l7rc_242">curl</code>:</span></p><div class="code-block" data-lang="bash">
+curl -X PATCH https://your-api-id.execute-api.your-region.amazonaws.com/prod/todos/your-todo-id \
+-H &quot;Content-Type: application/json&quot; \
+-d '{
+  &quot;title&quot;: &quot;Updated Title&quot;,
+  &quot;completed&quot;: true
+}'
+</div><ul class="list _bullet" id="-e3l7rc_240"><li class="list__item" id="-e3l7rc_243"><p><span class="control" id="-e3l7rc_244">Replace <code class="code" id="-e3l7rc_245">your-api-id</code>, <code class="code" id="-e3l7rc_246">your-region</code>, and <code class="code" id="-e3l7rc_247">your-todo-id</code></span> with your actual API ID, region, and the ID of the todo item you want to update.</p></li></ul></li><li class="list__item" id="-e3l7rc_230"><p id="-e3l7rc_248"><span class="control" id="-e3l7rc_250">Expected Response:</span></p><ul class="list _bullet" id="-e3l7rc_249"><li class="list__item" id="-e3l7rc_251"><p><span class="control" id="-e3l7rc_253">Success (200):</span> Returns a message confirming the todo was updated and includes the updated attributes.</p></li><li class="list__item" id="-e3l7rc_252"><p><span class="control" id="-e3l7rc_254">Error (400 or 500):</span> Returns an error message indicating what went wrong.</p></li></ul></li></ul></section><section class="chapter"><h4 id="c-verify-the-update-in-dynamodb" data-toc="c-verify-the-update-in-dynamodb">c. <span class="control" id="-e3l7rc_258">Verify the Update in DynamoDB</span></h4><ul class="list _bullet" id="-e3l7rc_256"><li class="list__item" id="-e3l7rc_259"><p><span class="control" id="-e3l7rc_260">Steps:</span></p><ul class="list _bullet" id="-e3l7rc_261"><li class="list__item" id="-e3l7rc_262"><p>Go to the <a href="https://console.aws.amazon.com/dynamodb/home" id="-e3l7rc_265" data-external="true" rel="noopener noreferrer">DynamoDB Console</a>.</p></li><li class="list__item" id="-e3l7rc_263"><p>Find the <code class="code" id="-e3l7rc_266">TodoTable</code>.</p></li><li class="list__item" id="-e3l7rc_264"><p>Check the item to ensure it has been updated with the new values.</p></li></ul></li></ul></section></section></section><section class="chapter"><h2 id="congratulations" data-toc="congratulations">🎉 Congratulations!</h2><p id="-e3l7rc_267"><span class="control" id="-e3l7rc_270">You've successfully added the <code class="code" id="-e3l7rc_271">updateTodo</code> functionality to your serverless application!</span></p><ul class="list _bullet" id="-e3l7rc_268"><li class="list__item" id="-e3l7rc_272"><p><span class="control" id="-e3l7rc_273">What this means:</span></p><ul class="list _bullet" id="-e3l7rc_274"><li class="list__item" id="-e3l7rc_275"><p>Clients can now update specific fields of a todo item via an HTTP PATCH request.</p></li><li class="list__item" id="-e3l7rc_276"><p>Your application now supports creating, reading, and updating todo items.</p></li></ul></li></ul></section><section class="chapter"><h2 id="additional-resources" data-toc="additional-resources">📚 Additional Resources</h2><ul class="list _bullet" id="-e3l7rc_277"><li class="list__item" id="-e3l7rc_278"><p><span class="control" id="-e3l7rc_284">AWS SDK for JavaScript v3 Documentation</span></p><ul class="list _bullet" id="-e3l7rc_285"><li class="list__item" id="-e3l7rc_286"><p><a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/welcome.html" id="-e3l7rc_287" data-external="true" rel="noopener noreferrer">AWS SDK v3 Guide</a></p></li></ul></li><li class="list__item" id="-e3l7rc_279"><p><span class="control" id="-e3l7rc_288">AWS CDK Documentation</span></p><ul class="list _bullet" id="-e3l7rc_289"><li class="list__item" id="-e3l7rc_290"><p><a href="https://docs.aws.amazon.com/cdk/latest/guide/home.html" id="-e3l7rc_291" data-external="true" rel="noopener noreferrer">AWS CDK Guide</a></p></li></ul></li><li class="list__item" id="-e3l7rc_280"><p><span class="control" id="-e3l7rc_292">Amazon DynamoDB Documentation</span></p><ul class="list _bullet" id="-e3l7rc_293"><li class="list__item" id="-e3l7rc_294"><p><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html" id="-e3l7rc_295" data-external="true" rel="noopener noreferrer">DynamoDB Introduction</a></p></li></ul></li><li class="list__item" id="-e3l7rc_281"><p><span class="control" id="-e3l7rc_296">AWS Lambda Documentation</span></p><ul class="list _bullet" id="-e3l7rc_297"><li class="list__item" id="-e3l7rc_298"><p><a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" id="-e3l7rc_299" data-external="true" rel="noopener noreferrer">AWS Lambda Developer Guide</a></p></li></ul></li><li class="list__item" id="-e3l7rc_282"><p><span class="control" id="-e3l7rc_300">Amazon API Gateway Documentation</span></p><ul class="list _bullet" id="-e3l7rc_301"><li class="list__item" id="-e3l7rc_302"><p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html" id="-e3l7rc_303" data-external="true" rel="noopener noreferrer">API Gateway Developer Guide</a></p></li></ul></li><li class="list__item" id="-e3l7rc_283"><p><span class="control" id="-e3l7rc_304">TypeScript Handbook</span></p><ul class="list _bullet" id="-e3l7rc_305"><li class="list__item" id="-e3l7rc_306"><p><a href="https://www.typescriptlang.org/docs/handbook/intro.html" id="-e3l7rc_307" data-external="true" rel="noopener noreferrer">TypeScript Documentation</a></p></li></ul></li></ul></section><div class="last-modified">Last modified: 09 November 2024</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom"><a href="creating-retrievetodos.html" class="navigation-links__prev">🔍 Creating `getTodo`</a><a href="empty-md-topic.html" class="navigation-links__next">🗑️ Creating `deleteTodo`</a></div></article><div id="disqus_thread"></div></div></section></main></div><script src="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b419/app.js"></script></body></html>

@@ -8,7 +8,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "start": "http-server D:/ReactProjects/aws_workshop_runa/instructions",
+    "deploy": "cdk synth && cdk deploy"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -24,8 +26,11 @@
     "@aws-cdk/aws-apigateway": "^1.204.0",
     "@aws-cdk/aws-dynamodb": "^1.204.0",
     "@aws-cdk/aws-lambda": "^1.204.0",
+    "@aws-sdk/client-dynamodb": "^3.687.0",
+    "@aws-sdk/lib-dynamodb": "^3.687.0",
     "aws-cdk-lib": "2.166.0",
     "constructs": "^10.0.0",
+    "esbuild": "^0.24.0",
     "source-map-support": "^0.5.21"
   }
 }

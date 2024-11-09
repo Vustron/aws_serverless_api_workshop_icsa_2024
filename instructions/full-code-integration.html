@@ -1,0 +1,166 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex"><meta name="built-on" content="2024-11-09T13:22:59.1450942"><title>🏗️ Complete CDK Stack Code with API Key Authentication | AWS Serverless Workshop</title><script type="application/json" id="virtual-toc-data">[{"id":"full-code-lib-serverless-app-stack-ts","level":0,"title":"📜 Full Code: lib/serverless-app-stack.ts","anchor":"#full-code-lib-serverless-app-stack-ts"},{"id":"understanding-the-complete-stack","level":0,"title":"🔍 Understanding the Complete Stack","anchor":"#understanding-the-complete-stack"},{"id":"deployment-and-testing","level":0,"title":"🚀 Deployment and Testing","anchor":"#deployment-and-testing"},{"id":"congratulations","level":0,"title":"🎉 Congratulations!","anchor":"#congratulations"},{"id":"additional-resources","level":0,"title":"📚 Additional Resources","anchor":"#additional-resources"}]</script><script type="application/json" id="topic-shortcuts"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b419/app.css" rel="stylesheet"><meta name="msapplication-TileColor" content="#000000"><link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"><meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="🏗️ Complete CDK Stack Code with API Key Authentication | AWS Serverless Workshop"><meta property="og:description" content=""><meta property="og:image" content=""><meta property="og:site_name" content="AWS Serverless Workshop Help"><meta property="og:type" content="website"><meta property="og:locale" content="en_US"><meta property="og:url" content="writerside-documentation//1/full-code-integration.html"><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="🏗️ Complete CDK Stack Code with API Key Authentication | AWS Serverless Workshop"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json">{
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "@id": "writerside-documentation//1/full-code-integration.html#webpage",
+    "url": "writerside-documentation//1/full-code-integration.html",
+    "name": "🏗️ Complete CDK Stack Code with API Key Authentication | AWS Serverless Workshop",
+    "description": "",
+    "image": "",
+    "inLanguage":"en-US"
+}</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json">{
+    "@type": "WebSite",
+    "@id": "writerside-documentation/#website",
+    "url": "writerside-documentation/",
+    "name": "AWS Serverless Workshop Help"
+}</script><!-- End Schema.org --></head><body data-id="Full-Code-Integration" data-main-title="🏗️ Complete CDK Stack Code with API Key Authentication" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs="main.md|Introduction"><div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>AWS Serverless Workshop 1 Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Full-Code-Integration" id="Full-Code-Integration.md">🏗️ Complete CDK Stack Code with API Key Authentication</h1><p id="-byx100_4"><span class="control" id="-byx100_11">Now that we've built each part of our serverless application step by step, let's put it all together. Below is the full AWS CDK stack code that includes all CRUD operations and secures the API endpoints using API Key Authentication.</span></p><section class="chapter"><h2 id="full-code-lib-serverless-app-stack-ts" data-toc="full-code-lib-serverless-app-stack-ts">📜 Full Code: <code class="code" id="-byx100_15">lib/serverless-app-stack.ts</code></h2><div class="code-block" data-lang="ts">
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as path from 'path';
+
+export class ServerlessAppStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // 🗄️ Create the DynamoDB Table
+    const table = new dynamodb.Table(this, 'TodoTable', {
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      tableName: 'TodoTable',
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    // 🛠️ Define Lambda Functions
+    const environment = {
+      TABLE_NAME: table.tableName,
+      AWS_REGION: this.region,
+    };
+    const bundling = {
+      minify: true,
+      sourceMap: false,
+      externalModules: [
+        '@aws-sdk/client-dynamodb',
+        '@aws-sdk/lib-dynamodb',
+      ],
+    };
+
+    // Create Todo
+    const createTodoFunction = new NodejsFunction(this, 'CreateTodoFunction', {
+      entry: path.join(__dirname, '../lambda/createTodo.ts'),
+      handler: 'handler',
+      environment,
+      bundling,
+    });
+    table.grantWriteData(createTodoFunction);
+
+    // Get All Todos
+    const getTodosFunction = new NodejsFunction(this, 'GetTodosFunction', {
+      entry: path.join(__dirname, '../lambda/getTodos.ts'),
+      handler: 'handler',
+      environment,
+      bundling,
+    });
+    table.grantReadData(getTodosFunction);
+
+    // Get Single Todo
+    const getTodoFunction = new NodejsFunction(this, 'GetTodoFunction', {
+      entry: path.join(__dirname, '../lambda/getTodo.ts'),
+      handler: 'handler',
+      environment,
+      bundling,
+    });
+    table.grantReadData(getTodoFunction);
+
+    // Update Todo
+    const updateTodoFunction = new NodejsFunction(this, 'UpdateTodoFunction', {
+      entry: path.join(__dirname, '../lambda/updateTodo.ts'),
+      handler: 'handler',
+      environment,
+      bundling,
+    });
+    table.grantWriteData(updateTodoFunction);
+
+    // Delete Todo
+    const deleteTodoFunction = new NodejsFunction(this, 'DeleteTodoFunction', {
+      entry: path.join(__dirname, '../lambda/deleteTodo.ts'),
+      handler: 'handler',
+      environment,
+      bundling,
+    });
+    table.grantWriteData(deleteTodoFunction);
+
+    // 🌐 Set Up API Gateway REST API
+    const api = new apigateway.RestApi(this, 'TodoApi', {
+      restApiName: 'Todo Service',
+      description: 'This service manages todos.',
+    });
+
+    // 🔑 Create API Key and Usage Plan
+    const apiKey = api.addApiKey('TodoApiKey', {
+      apiKeyName: 'todo-api-key',
+    });
+
+    const usagePlan = api.addUsagePlan('TodoApiUsagePlan', {
+      name: 'TodoApiUsagePlan',
+      throttle: {
+        rateLimit: 10,
+        burstLimit: 20,
+      },
+      quota: {
+        limit: 1000,
+        period: apigateway.Period.MONTH,
+      },
+    });
+
+    usagePlan.addApiKey(apiKey);
+    usagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    // 🗂️ Create the /todos Resource
+    const todos = api.root.addResource('todos');
+
+    // 🔗 Integrate createTodo Lambda with POST method on /todos
+    const createTodoIntegration = new apigateway.LambdaIntegration(createTodoFunction);
+    todos.addMethod('POST', createTodoIntegration, {
+      apiKeyRequired: true,
+    });
+
+    // 🔗 Integrate getTodos Lambda with GET method on /todos
+    const getTodosIntegration = new apigateway.LambdaIntegration(getTodosFunction);
+    todos.addMethod('GET', getTodosIntegration, {
+      apiKeyRequired: true,
+    });
+
+    // 🗂️ Create the /todos/{id} Resource
+    const todo = todos.addResource('{id}');
+
+    // 🔗 Integrate getTodo Lambda with GET method on /todos/{id}
+    const getTodoIntegration = new apigateway.LambdaIntegration(getTodoFunction);
+    todo.addMethod('GET', getTodoIntegration, {
+      apiKeyRequired: true,
+    });
+
+    // 🔗 Integrate updateTodo Lambda with PATCH method on /todos/{id}
+    const updateTodoIntegration = new apigateway.LambdaIntegration(updateTodoFunction);
+    todo.addMethod('PATCH', updateTodoIntegration, {
+      apiKeyRequired: true,
+    });
+
+    // 🔗 Integrate deleteTodo Lambda with DELETE method on /todos/{id}
+    const deleteTodoIntegration = new apigateway.LambdaIntegration(deleteTodoFunction);
+    todo.addMethod('DELETE', deleteTodoIntegration, {
+      apiKeyRequired: true,
+    });
+  }
+}
+</div></section><section class="chapter"><h2 id="understanding-the-complete-stack" data-toc="understanding-the-complete-stack">🔍 Understanding the Complete Stack</h2><p id="-byx100_16">Let's go through the code to understand how each part contributes to the application.</p><section class="chapter"><h3 id="dynamodb-table" data-toc="dynamodb-table">🗄️ DynamoDB Table</h3><ul class="list _bullet" id="-byx100_22"><li class="list__item" id="-byx100_23"><p><span class="control" id="-byx100_25">Purpose:</span> Stores all the todo items.</p></li><li class="list__item" id="-byx100_24"><p><span class="control" id="-byx100_26">Configuration:</span></p><ul class="list _bullet" id="-byx100_27"><li class="list__item" id="-byx100_28"><p><span class="control" id="-byx100_30">Partition Key:</span> <code class="code" id="-byx100_31">id</code> (String) &mdash; uniquely identifies each todo item.</p></li><li class="list__item" id="-byx100_29"><p><span class="control" id="-byx100_32">Billing Mode:</span> <code class="code" id="-byx100_33">PAY_PER_REQUEST</code> &mdash; pay only for the read/write operations you use.</p></li></ul></li></ul></section><section class="chapter"><h3 id="lambda-functions_1" data-toc="lambda-functions_1">🛠️ Lambda Functions</h3><ul class="list _bullet" id="-byx100_34"><li class="list__item" id="-byx100_36"><p><span class="control" id="-byx100_38">Purpose:</span> Handle the business logic for each CRUD operation.</p></li><li class="list__item" id="-byx100_37"><p><span class="control" id="-byx100_39">Shared Configuration:</span></p><ul class="list _bullet" id="-byx100_40"><li class="list__item" id="-byx100_41"><p><span class="control" id="-byx100_43">Environment Variables:</span> <code class="code" id="-byx100_44">TABLE_NAME</code> and <code class="code" id="-byx100_45">AWS_REGION</code> passed to each function.</p></li><li class="list__item" id="-byx100_42"><p><span class="control" id="-byx100_46">Bundling Options:</span></p><ul class="list _bullet" id="-byx100_47"><li class="list__item" id="-byx100_48"><p><span class="control" id="-byx100_50">Minify:</span> Reduces code size for better performance.</p></li><li class="list__item" id="-byx100_49"><p><span class="control" id="-byx100_51">External Modules:</span> Excludes AWS SDK v3 modules, as they are included in the Lambda runtime.</p></li></ul></li></ul></li></ul><section class="chapter"><h4 id="lambda-functions" data-toc="lambda-functions">Lambda Functions:</h4><ol class="list _decimal" id="-byx100_52" type="1"><li class="list__item" id="-byx100_54"><p><span class="control" id="-byx100_59"><code class="code" id="-byx100_60">createTodoFunction</code></span> &mdash; Handles creating new todo items.</p></li><li class="list__item" id="-byx100_55"><p><span class="control" id="-byx100_61"><code class="code" id="-byx100_62">getTodosFunction</code></span> &mdash; Retrieves all todo items.</p></li><li class="list__item" id="-byx100_56"><p><span class="control" id="-byx100_63"><code class="code" id="-byx100_65">getTodoFunction</code></span> &mdash; Retrieves a specific todo item by <code class="code" id="-byx100_64">id</code>.</p></li><li class="list__item" id="-byx100_57"><p><span class="control" id="-byx100_66"><code class="code" id="-byx100_67">updateTodoFunction</code></span> &mdash; Updates a specific todo item.</p></li><li class="list__item" id="-byx100_58"><p><span class="control" id="-byx100_68"><code class="code" id="-byx100_69">deleteTodoFunction</code></span> &mdash; Deletes a specific todo item.</p></li></ol><ul class="list _bullet" id="-byx100_53"><li class="list__item" id="-byx100_70"><p><span class="control" id="-byx100_71">Permissions:</span></p><ul class="list _bullet" id="-byx100_72"><li class="list__item" id="-byx100_73"><p><span class="control" id="-byx100_74"><code class="code" id="-byx100_75">grantReadData</code>/<code class="code" id="-byx100_76">grantWriteData</code>:</span> Grants the necessary DynamoDB permissions to each function.</p></li></ul></li></ul></section></section><section class="chapter"><h3 id="api-gateway" data-toc="api-gateway">🌐 API Gateway</h3><ul class="list _bullet" id="-byx100_77"><li class="list__item" id="-byx100_78"><p><span class="control" id="-byx100_80">Purpose:</span> Exposes the Lambda functions via HTTP endpoints.</p></li><li class="list__item" id="-byx100_79"><p><span class="control" id="-byx100_81">Configuration:</span></p><ul class="list _bullet" id="-byx100_82"><li class="list__item" id="-byx100_83"><p><span class="control" id="-byx100_85">API Name:</span> <code class="code" id="-byx100_86">Todo Service</code></p></li><li class="list__item" id="-byx100_84"><p><span class="control" id="-byx100_87">Description:</span> Brief description of the API.</p></li></ul></li></ul></section><section class="chapter"><h3 id="api-key-and-usage-plan" data-toc="api-key-and-usage-plan">🔑 API Key and Usage Plan</h3><ul class="list _bullet" id="-byx100_88"><li class="list__item" id="-byx100_89"><p id="-byx100_91"><span class="control" id="-byx100_93">API Key:</span></p><ul class="list _bullet" id="-byx100_92"><li class="list__item" id="-byx100_94"><p><span class="control" id="-byx100_96">Name:</span> <code class="code" id="-byx100_97">todo-api-key</code></p></li><li class="list__item" id="-byx100_95"><p><span class="control" id="-byx100_98">Purpose:</span> Secures the API endpoints by requiring clients to provide the API key.</p></li></ul></li><li class="list__item" id="-byx100_90"><p id="-byx100_99"><span class="control" id="-byx100_101">Usage Plan:</span></p><ul class="list _bullet" id="-byx100_100"><li class="list__item" id="-byx100_102"><p><span class="control" id="-byx100_106">Name:</span> <code class="code" id="-byx100_107">TodoApiUsagePlan</code></p></li><li class="list__item" id="-byx100_103"><p><span class="control" id="-byx100_108">Throttle Settings:</span></p><ul class="list _bullet" id="-byx100_109"><li class="list__item" id="-byx100_110"><p><span class="control" id="-byx100_112">Rate Limit:</span> 10 requests per second.</p></li><li class="list__item" id="-byx100_111"><p><span class="control" id="-byx100_113">Burst Limit:</span> 20 requests.</p></li></ul></li><li class="list__item" id="-byx100_104"><p><span class="control" id="-byx100_114">Quota Settings:</span></p><ul class="list _bullet" id="-byx100_115"><li class="list__item" id="-byx100_116"><p><span class="control" id="-byx100_117">Limit:</span> 1000 requests per month.</p></li></ul></li><li class="list__item" id="-byx100_105"><p><span class="control" id="-byx100_118">Associations:</span></p><ul class="list _bullet" id="-byx100_119"><li class="list__item" id="-byx100_120"><p>Links the API key to the usage plan and the API stage.</p></li></ul></li></ul></li></ul></section><section class="chapter"><h3 id="api-resources-and-methods" data-toc="api-resources-and-methods">🗂️ API Resources and Methods</h3><ul class="list _bullet" id="-byx100_121"><li class="list__item" id="-byx100_123"><p id="-byx100_125"><span class="control" id="-byx100_127"><code class="code" id="-byx100_128">/todos</code> Resource:</span></p><ul class="list _bullet" id="-byx100_126"><li class="list__item" id="-byx100_129"><p><span class="control" id="-byx100_132">POST Method:</span> Creates a new todo item (<code class="code" id="-byx100_133">createTodoFunction</code>).</p></li><li class="list__item" id="-byx100_130"><p><span class="control" id="-byx100_134">GET Method:</span> Retrieves all todo items (<code class="code" id="-byx100_135">getTodosFunction</code>).</p></li><li class="list__item" id="-byx100_131"><p><span class="control" id="-byx100_136">Security:</span> <code class="code" id="-byx100_137">apiKeyRequired: true</code></p></li></ul></li><li class="list__item" id="-byx100_124"><p id="-byx100_138"><span class="control" id="-byx100_140"><code class="code" id="-byx100_141">/todos/{id}</code> Resource:</span></p><ul class="list _bullet" id="-byx100_139"><li class="list__item" id="-byx100_142"><p><span class="control" id="-byx100_146">GET Method:</span> Retrieves a specific todo item (<code class="code" id="-byx100_147">getTodoFunction</code>).</p></li><li class="list__item" id="-byx100_143"><p><span class="control" id="-byx100_148">PATCH Method:</span> Updates a specific todo item (<code class="code" id="-byx100_149">updateTodoFunction</code>).</p></li><li class="list__item" id="-byx100_144"><p><span class="control" id="-byx100_150">DELETE Method:</span> Deletes a specific todo item (<code class="code" id="-byx100_151">deleteTodoFunction</code>).</p></li><li class="list__item" id="-byx100_145"><p><span class="control" id="-byx100_152">Security:</span> <code class="code" id="-byx100_153">apiKeyRequired: true</code></p></li></ul></li></ul></section></section><section class="chapter"><h2 id="deployment-and-testing" data-toc="deployment-and-testing">🚀 Deployment and Testing</h2><section class="chapter"><h3 id="1-synthesize-the-cloudformation-template" data-toc="1-synthesize-the-cloudformation-template">1. <span class="control" id="-byx100_161">Synthesize the CloudFormation Template</span></h3><div class="code-block" data-lang="bash">
+cdk synth
+</div><ul class="list _bullet" id="-byx100_160"><li class="list__item" id="-byx100_162"><p><span class="control" id="-byx100_163">Purpose:</span> Generates the CloudFormation template to review the resources before deploying.</p></li></ul></section><section class="chapter"><h3 id="2-deploy-the-stack" data-toc="2-deploy-the-stack">2. <span class="control" id="-byx100_167">Deploy the Stack</span></h3><div class="code-block" data-lang="bash">
+cdk deploy
+</div><ul class="list _bullet" id="-byx100_166"><li class="list__item" id="-byx100_168"><p><span class="control" id="-byx100_170">Action:</span> Provisions all resources defined in the stack.</p></li><li class="list__item" id="-byx100_169"><p><span class="control" id="-byx100_171">Confirmation:</span> Type <code class="code" id="-byx100_172">y</code> when prompted to confirm the deployment.</p></li></ul></section><section class="chapter"><h3 id="3-retrieve-the-api-key" data-toc="3-retrieve-the-api-key">3. <span class="control" id="-byx100_175">Retrieve the API Key</span></h3><ul class="list _bullet" id="-byx100_174"><li class="list__item" id="-byx100_176"><p><span class="control" id="-byx100_179">Navigate to API Gateway Console:</span></p><ul class="list _bullet" id="-byx100_180"><li class="list__item" id="-byx100_181"><p>Find your API under <span class="control" id="-byx100_182">APIs</span>.</p></li></ul></li><li class="list__item" id="-byx100_177"><p><span class="control" id="-byx100_183">Access API Keys:</span></p><ul class="list _bullet" id="-byx100_184"><li class="list__item" id="-byx100_185"><p>In the left panel, click on <span class="control" id="-byx100_187">API Keys</span>.</p></li><li class="list__item" id="-byx100_186"><p>Locate <code class="code" id="-byx100_188">todo-api-key</code>.</p></li></ul></li><li class="list__item" id="-byx100_178"><p><span class="control" id="-byx100_189">Copy the API Key Value:</span></p><ul class="list _bullet" id="-byx100_190"><li class="list__item" id="-byx100_191"><p><span class="control" id="-byx100_192">Important:</span> Copy it now, as it won't be visible later.</p></li></ul></li></ul></section><section class="chapter"><h3 id="4-test-the-api-endpoints" data-toc="4-test-the-api-endpoints">4. <span class="control" id="-byx100_197">Test the API Endpoints</span></h3><p id="-byx100_194">Use a tool like <span class="control" id="-byx100_198">Postman</span> or <span class="control" id="-byx100_199">curl</span> to test the API endpoints by including the <code class="code" id="-byx100_200">x-api-key</code> header with your API key.</p><ul class="list _bullet" id="-byx100_195"><li class="list__item" id="-byx100_201"><p id="-byx100_204"><span class="control" id="-byx100_206">Example:</span> Testing the GET <code class="code" id="-byx100_207">/todos</code> endpoint.</p><div class="code-block" data-lang="bash">
+curl -H &quot;x-api-key: YOUR_API_KEY_VALUE&quot; \
+     -X GET https://your-api-id.execute-api.your-region.amazonaws.com/prod/todos
+</div></li><li class="list__item" id="-byx100_202"><p id="-byx100_208"><span class="control" id="-byx100_210">Expected Response:</span></p><ul class="list _bullet" id="-byx100_209"><li class="list__item" id="-byx100_211"><p><span class="control" id="-byx100_213">Status Code:</span> 200 OK</p></li><li class="list__item" id="-byx100_212"><p><span class="control" id="-byx100_214">Body:</span> JSON array of todo items.</p></li></ul></li><li class="list__item" id="-byx100_203"><p id="-byx100_215"><span class="control" id="-byx100_216">Error Case:</span> Without the API key, you should receive a <code class="code" id="-byx100_217">403 Forbidden</code> error.</p></li></ul></section></section><section class="chapter"><h2 id="congratulations" data-toc="congratulations">🎉 Congratulations!</h2><p id="-byx100_218"><span class="control" id="-byx100_220">You've successfully built a secure, serverless API with full CRUD functionality using AWS CDK and TypeScript!</span></p></section><section class="chapter"><h2 id="additional-resources" data-toc="additional-resources">📚 Additional Resources</h2><ul class="list _bullet" id="-byx100_221"><li class="list__item" id="-byx100_222"><p><a href="https://docs.aws.amazon.com/cdk/latest/guide/home.html" id="-byx100_227" data-external="true" rel="noopener noreferrer">AWS CDK Documentation</a></p></li><li class="list__item" id="-byx100_223"><p><a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" id="-byx100_228" data-external="true" rel="noopener noreferrer">AWS Lambda Documentation</a></p></li><li class="list__item" id="-byx100_224"><p><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html" id="-byx100_229" data-external="true" rel="noopener noreferrer">Amazon DynamoDB Documentation</a></p></li><li class="list__item" id="-byx100_225"><p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html" id="-byx100_230" data-external="true" rel="noopener noreferrer">Amazon API Gateway Documentation</a></p></li><li class="list__item" id="-byx100_226"><p><a href="https://www.typescriptlang.org/docs/handbook/intro.html" id="-byx100_231" data-external="true" rel="noopener noreferrer">TypeScript Handbook</a></p></li></ul></section><div class="last-modified">Last modified: 09 November 2024</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom"><a href="adding-api-key.html" class="navigation-links__prev">🔒 Securing the API Endpoints</a><a href="conclusion.html" class="navigation-links__next">🎉 Conclusion</a></div></article><div id="disqus_thread"></div></div></section></main></div><script src="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b419/app.js"></script></body></html>
