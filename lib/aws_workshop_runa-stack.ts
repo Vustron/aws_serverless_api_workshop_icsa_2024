@@ -1,16 +1,20 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb"
+import * as cdk from "aws-cdk-lib"
+
+import type { Construct } from "constructs"
 
 export class AwsWorkshopRunaStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+    super(scope, id, props)
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'AwsWorkshopRunaQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const runaTodoTable = new dynamodb.Table(
+      this,
+      "todo_table_runa_michaeljoshua",
+      {
+        partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+        tableName: "todo_table_runa_michaeljoshua",
+        billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      },
+    )
   }
 }
